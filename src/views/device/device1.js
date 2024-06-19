@@ -19,11 +19,13 @@ const Device1 = () => {
   const handleChangeLocation = (e) => {
     const { value, name } = e.target;
     const loc = {}
-    loc[name] = Number(value)
-    setLocation({
-      ...location,
-      ...loc
-    });
+    if (Number.isInteger(value)) {
+      loc[name] = Number(value)
+      setLocation({
+        ...location,
+        ...loc
+      });
+    }
   };
   
   

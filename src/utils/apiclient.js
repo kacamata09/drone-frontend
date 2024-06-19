@@ -2,11 +2,11 @@
 import axios from "axios";
 import { getLocalStorageItem } from "./localStorage";
 
-// const apiUrl = process.env.REACT_APP_API_URL ;
+const apiUrl = process.env.REACT_APP_API_URL ;
 
 const apiClient = axios.create({
-  // baseURL: apiUrl,
-  baseURL: 'http://localhost:1111',
+  baseURL: apiUrl,
+  // baseURL: 'http://localhost:1111',
 });
 
 apiClient.interceptors.request.use(
