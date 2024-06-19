@@ -6,7 +6,7 @@ import { getLocalStorageItem } from "./localStorage";
 
 const apiClient = axios.create({
   // baseURL: apiUrl,
-  baseURL: 'http://localhost:1112',
+  baseURL: 'http://localhost:1111',
 });
 
 apiClient.interceptors.request.use(

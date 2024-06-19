@@ -7,13 +7,14 @@ import Marker from '../maps/Marker';
 
 const Device1 = () => {
 
-  // const [topic, setTopic] = useState("");
-  // const [dataTo, setDaTopic] = useState("");
   const [location, setLocation] = useState({
     latitude : -6.91099623162968,
     longitude :  107.59489115335117,
     altitude :  117,
   });
+
+  const[arming, setArming] = useState("arming")
+  const[fly_mode, setFlyMode] = useState("terbang_tinggi")
 
   const handleChangeLocation = (e) => {
     const { value, name } = e.target;
@@ -24,24 +25,8 @@ const Device1 = () => {
       ...loc
     });
   };
-
-  // const handleChange = (e) => {
-  //   const { value } = e.target;
-  //   setTopic(value);
-  // };
   
-  // const handleChange2 = async (e) => {
-  //   e.preventDefault();
-  //   try {
-
-  //     const data = await apiClient.get('/drone/' + topic + '/latest')
-  //     setDaTopic(data);
-  //     console.log('Success:', data);
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // };
-
+  
   const handleSubmitLocation = async (e) => {
     e.preventDefault();
     try {
@@ -54,24 +39,55 @@ const Device1 = () => {
         altitude: location.altitude, 
         }
       })
-      setDaTopic(data);
+      console.log('Success:', data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+  const handleChangeCB = (e) => {
+    const { value, name } = e.target;
+    if (name == "arming") {
+      setArming(value)
+      console.log('namemeee', name)
+      console.log(value)
+    }
+
+    if (name == "fly_mode") {
+      setFlyMode(value)
+      console.log('namemeee', name)
+      console.log(value)
+    }
+
+  };
+
+  const handleSubmitArming = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await apiClient.post('/drone/publish', {
+      topic : "kirei/drone/arming",
+      message: {arming} }
+      )
       console.log('Success:', data);
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   console.log('oi mina')
-  //   try {
-  //     const data = await apiClient.post('/drone/subscribe/' + topic)
-      
-  //     console.log('Success:', data);
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // };
+  const handleSubmitFlyMode = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await apiClient.post('/drone/publish', {
+      topic : "kirei/drone/flymode",
+      message: {fly_mode} }
+      )
+      console.log('Success:', data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+
 
 
   return (
@@ -200,15 +216,15 @@ const Device1 = () => {
             <Card.Body>
               <Row>
                 <Col md={12}>
-                  <form onSubmit={handleSubmitLocation}>
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlSelect1">
-                    <Form.Control as="select">
-                      <option>arming</option>
-                      <option>disarming</option>
-                    </Form.Control>
-                  </Form.Group>
-                  <Button type='submit' id='location'  variant="primary">Submit</Button>
-                  </form>
+                  <form onSubmit={handleSubmitArming}>
+                    <Form.Group className="mb-3" controlId="exampleForm.ControlSelect1">
+                      <Form.Control name='arming' onChange={handleChangeCB} as="select">
+                        <option value="arming">arming</option>
+                        <option value="disarming">disarming</option>
+                      </Form.Control>
+                    </Form.Group>
+                    <Button type='submit' id='arming' name='arming' variant="primary">Submit</Button>
+                    </form>
                 </Col>
               </Row>
             </Card.Body>
@@ -220,14 +236,14 @@ const Device1 = () => {
             <Card.Body>
               <Row>
                 <Col md={12}>
-                  <form onSubmit={handleSubmitLocation}>
+                  <form onSubmit={handleSubmitFlyMode}>
                   <Form.Group className="mb-3" controlId="exampleForm.ControlSelect1">
-                    <Form.Control as="select">
-                      <option>arming</option>
-                      <option>disarming</option>
+                    <Form.Control name='fly_mode' onChange={handleChangeCB} as="select">
+                      <option value="terbang_miring">terbang_miring</option>
+                      <option value="terbang_bebas">terbang_bebas</option>
                     </Form.Control>
                   </Form.Group>
-                  <Button type='submit' id='location'  variant="primary">Submit</Button>
+                  <Button type='submit' id='fly_mode' name='fly_mode' variant="primary">Submit</Button>
                   </form>
                 </Col>
               </Row>
