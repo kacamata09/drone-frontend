@@ -12,27 +12,27 @@ const menuItems = {
           type: 'item',
           icon: 'feather icon-home',
           url: '/dashboard'
-        },
-        {
-          id: 'device',
-          title: 'Device',
-          type: 'collapse',
-          icon: 'feather icon-box',
-          children: [
-            {
-              id: 'device1',
-              title: 'Device 1',
-              type: 'item',
-              url: '/device/1'
-            },
-            {
-              id: 'device2',
-              title: 'Device 2',
-              type: 'item',
-              url: '/device/2'
-            }
-          ]
         }
+        // {
+        //   id: 'device',
+        //   title: 'Device',
+        //   type: 'collapse',
+        //   icon: 'feather icon-box',
+        //   children: [
+        //     {
+        //       id: 'device1',
+        //       title: 'Device 1',
+        //       type: 'item',
+        //       url: '/device/1'
+        //     },
+        //     {
+        //       id: 'device2',
+        //       title: 'Device 2',
+        //       type: 'item',
+        //       url: '/device/2'
+        //     }
+        //   ]
+        // }
       ]
     },
     {

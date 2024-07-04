@@ -58,7 +58,8 @@ const routes = [
       {
         exact: 'true',
         path: '/dashboard',
-        element: lazy(() => import('./views/dashboard'))
+        // element: lazy(() => import('./views/dashboard'))
+        element: lazy(() => import('./views/device/device1'))
       },
       {
         exact: 'true',

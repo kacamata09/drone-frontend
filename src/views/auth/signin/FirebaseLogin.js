@@ -30,6 +30,7 @@ const FirebaseLogin = ({ className, ...rest }) => {
                 onChange={handleChange}
                 type="email"
                 value={values.email}
+                width={10}
               />
               {touched.email && errors.email && <small className="text-danger form-text">{errors.email}</small>}
             </div>
@@ -51,16 +52,15 @@ const FirebaseLogin = ({ className, ...rest }) => {
                 <Alert variant="danger">{errors.submit}</Alert>
               </Col>
             )}
-
-            <div className="custom-control custom-checkbox  text-start mb-4 mt-2">
+            {/* <div className="custom-control custom-checkbox  text-start mb-4 mt-2">
               <input type="checkbox" className="custom-control-input" id="customCheck1" />
               <label className="custom-control-label" htmlFor="customCheck1">
                 Save credentials.
               </label>
-            </div>
+            </div> */}
 
             <Row>
-              <Col mt={2}>
+              <Col mt={6}>
                 <Button className="btn-block" color="primary" disabled={isSubmitting} size="large" type="submit" variant="primary">
                   Signin
                 </Button>
@@ -70,19 +70,6 @@ const FirebaseLogin = ({ className, ...rest }) => {
         )}
       </Formik>
 
-      <Row>
-        <Col sm={12}>
-          <h5 className="my-3"> OR </h5>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col sm={12}>
-          <Button variant="danger">
-            <i className="fa fa-lock" /> Sign in with Google
-          </Button>
-        </Col>
-      </Row>
 
       <hr />
     </React.Fragment>
