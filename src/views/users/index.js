@@ -1,7 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Table } from 'react-bootstrap';
+import apiClient from '../../utils/apiclient';
 
 const BootstrapTable = () => {
+  const [dataUser, setDataUser] = useState(null)
+  
+  useEffect(()=> {
+    const fetchData = async () => {
+  
+      const data = await apiClient.get('/user')
+      setDataUser(data.data.data.data)
+        
+      console.log(data)
+      
+    }
+    fetchData()
+  }, [])
+  
   return (
     <React.Fragment>
       <Row>
@@ -21,12 +36,22 @@ const BootstrapTable = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  
+                {dataUser? dataUser.map((item, index) => (
+                  <tr key={index}>
                     <th scope="row">1</th>
-                    <td style={{color:'black'}}>Anshar</td>
+                    <td style={{color:'black'}}>{ item.fullname + index }</td>
+                    <td style={{color:'black'}}>{ item.email}</td>
+                    <td style={{color:'black'}}>{ item.username }</td>
+                  </tr>
+                  )) : ''}
+
+                  {/* <tr>
+                    <th scope="row">1</th>
+                    <td style={{color:'black'}}>{ dataUser ? dataUser.data.data.data[0].id : 'ya' }</td>
                     <td style={{color:'black'}}>The Last</td>
                     <td style={{color:'black'}}>@kacamata09</td>
-                  </tr>
+                  </tr> */}
                   <tr>
                     <th scope="row">2</th>
                     <td style={{color:'black'}}>Fatih</td>

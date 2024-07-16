@@ -34,29 +34,8 @@ const menuItems = {
         //   ]
         // }
       ]
-    },
-    {
-      id: 'ui-forms',
-      title: 'Admin',
-      type: 'group',
-      icon: 'icon-group',
-      children: [
-        // {
-        //   id: 'forms',
-        //   title: 'Form Elements',
-        //   type: 'item',
-        //   icon: 'feather icon-file-text',
-        //   url: '/forms/form-basic'
-        // },
-        {
-          id: 'table',
-          title: 'User Management',
-          type: 'item',
-          icon: 'feather icon-server',
-          url: '/users'
-        }
-      ]
     }
+  
     // {
     //   id: 'pages',
     //   title: 'Pages',
@@ -95,5 +74,32 @@ const menuItems = {
     // }
   ]
 };
+
+if (localStorage.getItem('accessToken')) {
+  menuItems.items.push(
+    {
+      id: 'ui-forms',
+      title: 'Admin',
+      type: 'group',
+      icon: 'icon-group',
+      children: [
+        // {
+        //   id: 'forms',
+        //   title: 'Form Elements',
+        //   type: 'item',
+        //   icon: 'feather icon-file-text',
+        //   url: '/forms/form-basic'
+        // },
+        {
+          id: 'table',
+          title: 'User Management',
+          type: 'item',
+          icon: 'feather icon-server',
+          url: '/users'
+        } 
+      ]
+    } 
+  )
+}
 
 export default menuItems;

@@ -11,6 +11,13 @@ import avatar3 from '../../../../assets/images/user/avatar-3.jpg';
 import avatar4 from '../../../../assets/images/user/avatar-4.jpg';
 
 const NavRight = () => {
+  const token = localStorage.getItem('accessToken')
+  var isLoggedIn
+  if(token) {
+    isLoggedIn = true
+  } else {
+    isLoggedIn = false
+  }
   const [listOpen, setListOpen] = useState(false);
 
   const notiData = [
@@ -117,11 +124,16 @@ const NavRight = () => {
               <div className="pro-head">
                 <img src={avatar1} className="img-radius" alt="User Profile" />
                 <span>John Doe</span>
-                <Link to="#" className="dud-logout" title="Logout">
+
+                <Link onClick={(e)=> {
+                  e.preventDefault()
+                  localStorage.removeItem('accessToken')
+                }}  to="/login" className="dud-logout" title="Logout">
                   <i className="feather icon-log-out" />
                 </Link>
               </div>
               <ListGroup as="ul" bsPrefix=" " variant="flush" className="pro-body">
+              { isLoggedIn ? <>
                 <ListGroup.Item as="li" bsPrefix=" ">
                   <Link to="#" className="dropdown-item">
                     <i className="feather icon-settings" /> Settings
@@ -144,10 +156,29 @@ const NavRight = () => {
                 </ListGroup.Item>
                 <ListGroup.Item as="li" bsPrefix=" ">
                   <Link to="#" className="dropdown-item">
+                    <i className="feather icon-lock" /> Lock Screen
+                  </Link>
+                </ListGroup.Item>
+                <ListGroup.Item as="li" bsPrefix=" ">
+                  <Link onClick={(e)=> {
+                  e.preventDefault()
+                  localStorage.removeItem('accessToken')
+                  window.location.reload()
+                }} to="/login" className="dropdown-item">
                     <i className="feather icon-log-out" /> Logout
                   </Link>
                 </ListGroup.Item>
+            
+              </>: <>
+              
+                <ListGroup.Item as="li" bsPrefix=" ">
+                  <Link to="/login" className="dropdown-item">
+                    <i className="feather icon-lock" /> Login
+                  </Link>
+                </ListGroup.Item>
+              </>}
               </ListGroup>
+              
             </Dropdown.Menu>
           </Dropdown>
         </ListGroup.Item>
