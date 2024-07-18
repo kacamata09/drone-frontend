@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, ListGroup, Dropdown } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import ChatList from './ChatList';
@@ -11,6 +11,8 @@ import avatar3 from '../../../../assets/images/user/avatar-3.jpg';
 import avatar4 from '../../../../assets/images/user/avatar-4.jpg';
 
 const NavRight = () => {
+
+  const navigate = useNavigate()
   const token = localStorage.getItem('accessToken')
   var isLoggedIn
   if(token) {
@@ -163,8 +165,10 @@ const NavRight = () => {
                   <Link onClick={(e)=> {
                   e.preventDefault()
                   localStorage.removeItem('accessToken')
-                  window.location.reload()
-                }} to="/login" className="dropdown-item">
+                  // window.location.reload()
+                  // e.location.reload
+                  navigate('/')
+                }} className="dropdown-item">
                     <i className="feather icon-log-out" /> Logout
                   </Link>
                 </ListGroup.Item>

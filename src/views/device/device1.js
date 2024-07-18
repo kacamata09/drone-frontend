@@ -28,7 +28,8 @@ const Device1 = () => {
   const handleChangeLocation = (e) => {
     const { value, name } = e.target;
     const loc = {}
-    if (Number.isInteger(value)) {
+    console.log(Number.isInteger((value)))
+    if (Number.isInteger(Number(value))) {
       loc[name] = Number(value)
       setLocation({
         ...location,
@@ -42,7 +43,7 @@ const Device1 = () => {
     e.preventDefault();
     try {
 
-      const data = await apiClient.post('/drone/publish', {
+      const data = await apiClient.post('/mqtt/publish', {
       topic : "kirei/drone/latlon",
       message: {
         latitude: location.latitude,
@@ -75,7 +76,7 @@ const Device1 = () => {
   const handleSubmitArming = async (e) => {
     e.preventDefault();
     try {
-      const data = await apiClient.post('/drone/publish', {
+      const data = await apiClient.post('/mqtt/publish', {
       topic : "kirei/drone/arming",
       message: {arming} }
       )
@@ -88,7 +89,7 @@ const Device1 = () => {
   const handleSubmitFlyMode = async (e) => {
     e.preventDefault();
     try {
-      const data = await apiClient.post('/drone/publish', {
+      const data = await apiClient.post('/mqtt/publish', {
       topic : "kirei/drone/flymode",
       message: {fly_mode} }
       )
