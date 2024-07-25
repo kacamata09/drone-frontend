@@ -7,14 +7,14 @@ import Marker from '../maps/Marker';
 
 const Device1 = () => {
 
-  var isLoggedIn = true
-  const token = localStorage.getItem('accessToken')
-  console.log(token)
-  if (token) {
-    isLoggedIn = true
-  } else {
-    isLoggedIn = false
-  }
+  // var isLoggedIn = true
+  // const token = localStorage.getItem('accessToken')
+  // console.log(token)
+  // if (token) {
+  //   isLoggedIn = true
+  // } else {
+  //   isLoggedIn = false
+  // }
 
   const [location, setLocation] = useState({
     latitude : -6.91099623162968,
@@ -187,7 +187,7 @@ const Device1 = () => {
             </Card.Body>
           </Card>
         </Col>
-        {isLoggedIn ? <>  
+        {/* {isLoggedIn ? <>   */}
         <Col xl={6}>
           <Card>
             <Card.Header>
@@ -262,7 +262,7 @@ const Device1 = () => {
           </Card>
         </Col>
         
-        </> : <></> }
+        {/* </> : <></> } */}
       </Row>
     </React.Fragment>
   );
