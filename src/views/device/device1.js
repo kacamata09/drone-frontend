@@ -4,8 +4,12 @@ import { Row, Col, Card, Form, Button, Table } from 'react-bootstrap';
 // import { Link } from 'react-router-dom';
 import apiClient from '../../utils/apiclient';
 import Marker from '../maps/Marker';
+import { publishMessage, subscribeToTopic } from '../../utils/mqttClient';
+// import mqtt from 'mqtt'
 
 const Device1 = () => {
+
+// var latestMessages = new Map()
 
   // var isLoggedIn = true
   // const token = localStorage.getItem('accessToken')
@@ -13,26 +17,52 @@ const Device1 = () => {
   // if (token) {
   //   isLoggedIn = true
   // } else {
-  //   isLoggedIn = false
-  // }
-
+    //   isLoggedIn = false
+    // }
+    
   const [location, setLocation] = useState({
     latitude : -6.91099623162968,
     longitude :  107.59489115335117,
     altitude :  117,
   });
 
+  const [locationForm, setLocationForm] = useState({
+    latitude : -6.91099623162968,
+    longitude :  107.59489115335117,
+    altitude :  117,
+  });
+
+  const getLatlon = (message) => {
+    if (!message) {
+      console.log('apalah')
+    } else {
+
+      const dataLatlon = JSON.parse(message)
+      console.log(message)
+      setLocation(
+        {
+          latitude : dataLatlon.latitude,
+          longitude : dataLatlon.longitude,
+          altitude : dataLatlon.altitude
+        }
+      )
+    }
+    console.log(location)
+  }
+  // mqtt_client.subscribe('kirei/drone/latlon')
+  subscribeToTopic('kirei/drone/latlon', getLatlon)
+  
   const[arming, setArming] = useState("arming")
   const[fly_mode, setFlyMode] = useState("terbang_tinggi")
-
+  
   const handleChangeLocation = (e) => {
     const { value, name } = e.target;
     const loc = {}
     console.log(Number.isInteger((value)))
     if (Number.isInteger(Number(value))) {
       loc[name] = Number(value)
-      setLocation({
-        ...location,
+      setLocationForm({
+        ...locationForm,
         ...loc
       });
     }
@@ -43,15 +73,15 @@ const Device1 = () => {
     e.preventDefault();
     try {
 
-      const data = await apiClient.post('/mqtt/publish', {
-      topic : "kirei/drone/latlon",
-      message: {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        altitude: location.altitude, 
-        }
-      })
-      console.log('Success:', data);
+      // const data = await apiClient.post('/mqtt/publish', body)
+      publishMessage('kirei/drone/latlon', JSON.stringify({
+        latitude: locationForm.latitude,
+        longitude: locationForm.longitude,
+        altitude: locationForm.altitude, 
+        }))
+
+      
+      // console.log('Success:', data);
     } catch (error) {
       console.error('Error:', error);
     }
