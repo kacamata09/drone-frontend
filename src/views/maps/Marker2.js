@@ -3,7 +3,7 @@ import { TileLayer, Marker, Popup, MapContainer, useMapEvents, useMap } from 're
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import PropTypes from 'prop-types';
-import { subscribeToTopic } from '../../utils/mqttClient';
+import sub from '../../utils/sub';
 
 // Set Icon Marker
 delete L.Icon.Default.prototype._getIconUrl;
@@ -19,29 +19,20 @@ const customIcon = L.icon({
 
 // Main MapWithAMarker Component
 const MapWithAMarker = ({ lat, lon, onMapClick }) => {
-  const initialPosition = [-6.9104384787805415, 107.5945306950941];
+  const initialPosition = [-6.910177169912409, 107.59454377100627];
   const [markerPosition, setMarkerPosition] = useState(initialPosition);
   const [marker1Position, setMarker1Position] = useState(initialPosition);
 
 
   // Fetch data from MQTT for Drone Marker
   useEffect(() => {
-    const getLatlon = (message) => {
-      if (!message) {
-        console.log('No message received');
-      } else {
-        const dataLatlon = JSON.parse(message);
-        console.log('Received message:', message);
-        setLocation({
-          latitude: dataLatlon.latitude,
-          longitude: dataLatlon.longitude,
-          altitude: dataLatlon.altitude
-        });
-        setMarker1Position([dataLatlon.latitude, dataLatlon.longitude]);
-      }
+    const topic = 'kpkirei/pubdrone';
+    sub(topic, (data) => {
+      setMarker1Position([data.latitude, data.longitude]);
+    });
+    return () => {
+      // Cleanup logic for unsubscribing if needed
     };
-
-    subscribeToTopic('kirei/drone/latlon', getLatlon);
   }, []);
 
   // Handles map clicks to update marker position

@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
-import { Row, Col, Card, Form, Button, Table } from 'react-bootstrap';
+//FixBUGS
 
-// import { Link } from 'react-router-dom';
-import apiClient from '../../utils/apiclient';
-import Marker from '../maps/Marker';
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Card, Form, Button, Table } from 'react-bootstrap';
+import Marker from '../maps/Marker2';
+import { publishMessage } from '../../utils/mqttClient';
+import sub from '../../utils/sub';
 
 const Device1 = () => {
-
-  // var isLoggedIn = true
-  // const token = localStorage.getItem('accessToken')
-  // console.log(token)
-  // if (token) {
-  //   isLoggedIn = true
-  // } else {
-  //   isLoggedIn = false
-  // }
+  const initialLocation = {
+    latitude: '',
+    longitude: '',
+    altitude: '',
+  };
 
   const [location, setLocation] = useState({
     latitude : -6.91099623162968,
@@ -22,65 +19,84 @@ const Device1 = () => {
     altitude :  117,
   });
 
-  const[arming, setArming] = useState("arming")
-  const[fly_mode, setFlyMode] = useState("terbang_tinggi")
+  const [locationForm, setLocationForm] = useState(initialLocation);
+  const [arming, setArming] = useState("arming");
+  const [fly_mode, setFlyMode] = useState("terbang_tinggi");
+  const [lastActive, setLastActive] = useState(new Date().toLocaleString());
+
+
+  const handleUpdateLocation = (newLocation) => {
+    setLocation({
+      latitude: newLocation.latitude,
+      longitude: newLocation.longitude,
+      altitude: newLocation.altitude,
+    });
+    setLastActive(new Date().toLocaleString());
+  };
+
+  //Subscribe Fake Device Drone
+  useEffect(() => {
+    const topic = 'kpkirei/pubdrone';
+    sub(topic, handleUpdateLocation)
+    return () => {
+    };
+  }, []);
+
+
+  const handleMapClick = (lat, lon) => {
+    setLocationForm({
+      ...location,
+      latitude: lat,
+      longitude: lon,
+    });
+  };
+
+
 
   const handleChangeLocation = (e) => {
     const { value, name } = e.target;
-    const loc = {}
-    console.log(Number.isInteger((value)))
-    if (Number.isInteger(Number(value))) {
-      loc[name] = Number(value)
+    if (!isNaN(value)) {
       setLocation({
         ...location,
-        ...loc
+        [name]: Number(value),
       });
     }
   };
-  
-  
+
   const handleSubmitLocation = async (e) => {
     e.preventDefault();
     try {
+      publishMessage('kirei/drone/latlon', JSON.stringify({
+        latitude: parseFloat(locationForm.latitude),
+        longitude: parseFloat(locationForm.longitude),
+        altitude: parseFloat(locationForm.altitude),
+      }));
+      console.log('Location submitted:', locationForm);
 
-      const data = await apiClient.post('/mqtt/publish', {
-      topic : "kirei/drone/latlon",
-      message: {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        altitude: location.altitude, 
-        }
-      })
-      console.log('Success:', data);
+      // Reset locationForm state to initial values
+      setLocationForm(initialLocation);
     } catch (error) {
       console.error('Error:', error);
     }
   };
-  
+
   const handleChangeCB = (e) => {
     const { value, name } = e.target;
-    if (name == "arming") {
-      setArming(value)
-      console.log('namemeee', name)
-      console.log(value)
+    if (name === "arming") {
+      setArming(value);
     }
 
-    if (name == "fly_mode") {
-      setFlyMode(value)
-      console.log('namemeee', name)
-      console.log(value)
+    if (name === "fly_mode") {
+      setFlyMode(value);
     }
-
   };
 
   const handleSubmitArming = async (e) => {
     e.preventDefault();
     try {
-      const data = await apiClient.post('/mqtt/publish', {
-      topic : "kirei/drone/arming",
-      message: {arming} }
-      )
-      console.log('Success:', data);
+      console.log('Publishing arming message:', arming);
+      publishMessage('kirei/drone/arming', JSON.stringify({ arming }));
+      console.log('Arming submitted:', arming);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -89,16 +105,13 @@ const Device1 = () => {
   const handleSubmitFlyMode = async (e) => {
     e.preventDefault();
     try {
-      const data = await apiClient.post('/mqtt/publish', {
-      topic : "kirei/drone/flymode",
-      message: {fly_mode} }
-      )
-      console.log('Success:', data);
+      console.log('Publishing fly mode message:', fly_mode);
+      publishMessage('kirei/drone/flymode', JSON.stringify({ fly_mode }));
+      console.log('Fly mode submitted:', fly_mode);
     } catch (error) {
       console.error('Error:', error);
     }
   };
-
 
   return (
     <React.Fragment>
@@ -109,16 +122,11 @@ const Device1 = () => {
               <Card.Title as="h5">Maps Location</Card.Title>
             </Card.Header>
             <Card.Body>
-
-            <Marker
-              lat={location.latitude}
-              lon={location.longitude}
-              // googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyAChufWiMfwsmyX3Se1dRaN4t31z0xmIMo&v=3.exp&libraries=geometry,drawing,places"
-              // loadingElement={<div style={{ height: `100%` }} />}
-              // containerElement={<div style={{ height: `400px` }} />}
-              // mapElement={<div style={{ height: `100%` }} />}
+              <Marker
+                lat={location.latitude}
+                lon={location.longitude}
+                onMapClick={handleMapClick}
               />
-
             </Card.Body>
           </Card>
         </Col>
@@ -132,9 +140,6 @@ const Device1 = () => {
                 <thead>
                   <tr>
                     <th>Last Update</th>
-                    {/* <th>Completed</th>
-                    <th>Status</th>
-                    <th>Date</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -146,7 +151,6 @@ const Device1 = () => {
                       <h6 className="m-0">{location.latitude}</h6>
                     </td>
                   </tr>
-
                   <tr>
                     <td>
                       <span className="pie_2">Longitude</span>
@@ -154,17 +158,15 @@ const Device1 = () => {
                     <td>
                       <h6 className="m-0">{location.longitude}</h6>
                     </td>
-                  </tr
-                  >
+                  </tr>
                   <tr>
                     <td>
                       <span className="pie_2">Altitude</span>
                     </td>
                     <td>
-                      <h6 className="m-0">20.2235</h6>
+                      <h6 className="m-0">{location.altitude}</h6>
                     </td>
                   </tr>
-
                   <tr>
                     <td>
                       <span className="pie_2">Fly Mode</span>
@@ -173,13 +175,12 @@ const Device1 = () => {
                       <h6 className="m-0">ON</h6>
                     </td>
                   </tr>
-
                   <tr>
                     <td>
                       <span className="pie_2">Last Active</span>
                     </td>
                     <td>
-                      <h6 className="m-0">September 4, 2017</h6>
+                      <h6 className="m-0">{lastActive}</h6>
                     </td>
                   </tr>
                 </tbody>
@@ -187,7 +188,6 @@ const Device1 = () => {
             </Card.Body>
           </Card>
         </Col>
-        {/* {isLoggedIn ? <>   */}
         <Col xl={6}>
           <Card>
             <Card.Header>
@@ -197,22 +197,19 @@ const Device1 = () => {
               <Row>
                 <Col md={12}>
                   <form onSubmit={handleSubmitLocation}>
-                  <Form.Group  className="mb-3" controlId="latitude">
-                    <Form.Label>Latitude</Form.Label>
-                    <Form.Control style={{color: "black"}}  id="latitude" name="latitude"
-                     onChange={handleChangeLocation} type="text" placeholder="latitude" />
-                  </Form.Group>
-                  <Form.Group  className="mb-3" controlId="longitude">
-                    <Form.Label>Longitude</Form.Label>
-                    <Form.Control style={{color: "black"}}  id="longitude" name="longitude"
-                     onChange={handleChangeLocation} type="text" placeholder="longitude" />
-                  </Form.Group>
-                  <Form.Group  className="mb-3" controlId="altitude">
-                    <Form.Label>Altitude</Form.Label>
-                    <Form.Control style={{color: "black"}}  id="altitude" name="altitude"
-                    onChange={handleChangeLocation} type="text" placeholder="altitude" />
-                  </Form.Group>
-                  <Button type='submit' id='location'  variant="primary">Submit</Button>
+                    <Form.Group className="mb-3" controlId="latitude">
+                      <Form.Label>Latitude</Form.Label>
+                      <Form.Control style={{ color: "black" }} id="latitude" name="latitude" value={locationForm.latitude} onChange={handleChangeLocation} type="text" placeholder="latitude" />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="longitude">
+                      <Form.Label>Longitude</Form.Label>
+                      <Form.Control style={{ color: "black" }} id="longitude" name="longitude" value={locationForm.longitude} onChange={handleChangeLocation} type="text" placeholder="longitude" />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="altitude">
+                      <Form.Label>Altitude</Form.Label>
+                      <Form.Control style={{ color: "black" }} id="altitude" name="altitude" value={locationForm.altitude} onChange={handleChangeLocation} type="text" placeholder="altitude" />
+                    </Form.Group>
+                    <Button type="submit" id="location" variant="primary">Submit</Button>
                   </form>
                 </Col>
               </Row>
@@ -234,8 +231,8 @@ const Device1 = () => {
                         <option value="disarming">disarming</option>
                       </Form.Control>
                     </Form.Group>
-                    <Button type='submit' id='arming' name='arming' variant="primary">Submit</Button>
-                    </form>
+                    <Button type="submit" id="arming" name="arming" variant="primary">Submit</Button>
+                  </form>
                 </Col>
               </Row>
             </Card.Body>
@@ -248,21 +245,19 @@ const Device1 = () => {
               <Row>
                 <Col md={12}>
                   <form onSubmit={handleSubmitFlyMode}>
-                  <Form.Group className="mb-3" controlId="exampleForm.ControlSelect1">
-                    <Form.Control name='fly_mode' onChange={handleChangeCB} as="select">
-                      <option value="terbang_miring">terbang_miring</option>
-                      <option value="terbang_bebas">terbang_bebas</option>
-                    </Form.Control>
-                  </Form.Group>
-                  <Button type='submit' id='fly_mode' name='fly_mode' variant="primary">Submit</Button>
+                    <Form.Group className="mb-3" controlId="exampleForm.ControlSelect1">
+                      <Form.Control name='fly_mode' onChange={handleChangeCB} as="select">
+                        <option value="terbang_miring">terbang_miring</option>
+                        <option value="terbang_bebas">terbang_bebas</option>
+                      </Form.Control>
+                    </Form.Group>
+                    <Button type="submit" id="fly_mode" name="fly_mode" variant="primary">Submit</Button>
                   </form>
                 </Col>
               </Row>
             </Card.Body>
           </Card>
         </Col>
-        
-        {/* </> : <></> } */}
       </Row>
     </React.Fragment>
   );
